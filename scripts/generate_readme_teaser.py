@@ -1,7 +1,8 @@
-"""Generate a README image plate from organized LoRFT trajectory data.
+"""Generate a clean single-scene README teaser from LoRFT trajectory labels.
 
-The figure visualizes trajectory labels only. It does not draw road maps,
-predictions, or experimental results.
+The output is intentionally simple: one fixed-camera frame with a small number
+of trajectory snippets and vehicle boxes. It visualizes only trajectory labels,
+not maps or model predictions.
 """
 
 from __future__ import annotations
@@ -10,14 +11,13 @@ import argparse
 from pathlib import Path
 
 import cv2
-import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 
 
 COLS = ["frame", "id", "x", "y", "w", "h", "c", "d", "e", "label"]
-OBS_COLOR = "#1F77B4"
-REF_COLOR = "#D55E00"
-BOX_ALPHA = 0.78
+OBS_COLOR = (185, 115, 28)  # BGR blue
+REF_COLOR = (0, 116, 214)  # BGR orange
 
 
 def load_gt(path: Path) -> pd.DataFrame:
@@ -27,7 +27,7 @@ def load_gt(path: Path) -> pd.DataFrame:
     return df
 
 
-def read_frame(video_path: Path, frame_idx: int):
+def read_frame(video_path: Path, frame_idx: int) -> np.ndarray:
     cap = cv2.VideoCapture(str(video_path))
     if not cap.isOpened():
         raise RuntimeError(f"Could not open video: {video_path}")
@@ -36,159 +36,104 @@ def read_frame(video_path: Path, frame_idx: int):
     cap.release()
     if not ok:
         raise RuntimeError(f"Could not read frame {frame_idx} from {video_path}")
-    return cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    return frame
 
 
-def choose_units(summary: pd.DataFrame, dataset_root: Path, n: int = 4) -> list[tuple[str, str, Path, Path]]:
-    preferred = ["G5013-K207", "G5013-K212", "G0512-K82", "G5-K2310", "G5-K1846", "SA2-K188"]
-    pref_rank = {scene: i for i, scene in enumerate(preferred)}
-    rows = summary.copy()
-    rows["rank"] = rows["scene"].map(pref_rank).fillna(999).astype(int)
-    rows = rows.sort_values(
-        ["rank", "vehicle_trajectories", "vehicle_bounding_boxes"],
-        ascending=[True, False, False],
-    )
-    chosen: list[tuple[str, str, Path, Path]] = []
-    used_scenes: set[str] = set()
+def select_unit(summary: pd.DataFrame, dataset_root: Path, preferred_scene: str) -> tuple[str, str, Path, Path]:
+    rows = summary[summary["scene"] == preferred_scene].copy()
+    if rows.empty:
+        rows = summary.copy()
+    rows = rows.sort_values(["vehicle_trajectories", "vehicle_bounding_boxes"], ascending=False)
     for row in rows.itertuples(index=False):
-        if row.scene in used_scenes:
-            continue
         gt_path = dataset_root / "gt" / row.scene / row.unit / "gt" / "gt.txt"
         video_path = dataset_root / "video" / f"{row.unit}.mp4"
-        if not gt_path.exists() or not video_path.exists():
-            continue
-        gt = load_gt(gt_path)
-        if gt["label"].nunique() < 2:
-            continue
-        chosen.append((row.scene, row.unit, gt_path, video_path))
-        used_scenes.add(row.scene)
-        if len(chosen) >= n:
-            break
-    if len(chosen) < n:
-        raise RuntimeError(f"Only found {len(chosen)} usable scene examples.")
-    return chosen
+        if gt_path.exists() and video_path.exists():
+            return row.scene, row.unit, gt_path, video_path
+    raise RuntimeError("No usable GT/video pair found.")
 
 
-def choose_frame(gt: pd.DataFrame) -> int:
-    counts = gt.groupby("frame").size().sort_values(ascending=False)
-    for frame in counts.index[:200]:
-        labels = set(gt.loc[gt["frame"] == frame, "label"].astype(int))
-        if 0 in labels or 1 in labels:
-            return int(frame)
-    return int(counts.index[0])
-
-
-def choose_tracks(gt: pd.DataFrame, frame: int, max_tracks: int = 8) -> list[int]:
-    present = set(gt.loc[gt["frame"] == frame, "id"].astype(int))
-    scored = []
-    for track_id, track in gt.groupby("id"):
-        n_obs = int((track["label"] == 0).sum())
-        n_ref = int((track["label"] == 1).sum())
-        if n_obs == 0 and n_ref == 0:
-            continue
-        if int(track_id) not in present:
-            continue
-        score = len(track) + min(n_ref, 80)
-        scored.append((score, int(track_id)))
-    scored.sort(reverse=True)
-    return [track_id for _, track_id in scored[:max_tracks]]
-
-
-def draw_box(ax, row) -> None:
-    color = OBS_COLOR if int(row.label) == 0 else REF_COLOR
-    rect = plt.Rectangle(
-        (row.x, row.y),
-        row.w,
-        row.h,
-        fill=False,
-        edgecolor=color,
-        linewidth=1.0,
-        alpha=BOX_ALPHA,
+def select_frame(gt: pd.DataFrame) -> int:
+    frame_stats = (
+        gt.groupby("frame")
+        .agg(n=("id", "count"), n_obs=("label", lambda x: int((x == 0).sum())), n_ref=("label", lambda x: int((x == 1).sum())))
+        .reset_index()
     )
-    ax.add_patch(rect)
+    frame_stats["score"] = frame_stats["n_obs"] * 3 + frame_stats["n_ref"] * 2 + frame_stats["n"]
+    frame_stats = frame_stats[(frame_stats["n_obs"] >= 5) & (frame_stats["n_ref"] >= 2)]
+    if frame_stats.empty:
+        frame_stats = gt.groupby("frame").size().reset_index(name="score")
+    return int(frame_stats.sort_values("score", ascending=False).iloc[0]["frame"])
 
 
-def draw_panel(ax, scene: str, unit: str, gt_path: Path, video_path: Path) -> None:
-    gt = load_gt(gt_path)
-    frame_idx = choose_frame(gt)
-    frame = read_frame(video_path, frame_idx)
-    ax.imshow(frame)
-
-    tracks = choose_tracks(gt, frame_idx)
-    for track_id in tracks:
-        track = gt[gt["id"] == track_id].sort_values("frame")
-        lo = frame_idx - 180
-        hi = frame_idx + 180
-        track = track[(track["frame"] >= lo) & (track["frame"] <= hi)]
-        obs = track[track["label"] == 0]
-        ref = track[track["label"] == 1]
-        if len(obs) >= 2:
-            ax.plot(obs["bc_x"], obs["bc_y"], color=OBS_COLOR, lw=1.0, alpha=0.65)
-        if len(ref) >= 2:
-            ax.plot(ref["bc_x"], ref["bc_y"], color=REF_COLOR, lw=1.0, alpha=0.78)
-
+def select_visible_tracks(gt: pd.DataFrame, frame_idx: int) -> list[int]:
     current = gt[gt["frame"] == frame_idx].copy()
     current["area"] = current["w"] * current["h"]
-    for row in current.sort_values("area", ascending=False).head(18).itertuples(index=False):
-        draw_box(ax, row)
-
-    ax.set_title(scene, loc="left", fontsize=10, fontweight="bold", pad=4)
-    ax.set_xlim(0, frame.shape[1])
-    ax.set_ylim(frame.shape[0], 0)
-    ax.set_xticks([])
-    ax.set_yticks([])
-    for spine in ax.spines.values():
-        spine.set_color("#D0D7DE")
-        spine.set_linewidth(0.8)
+    obs = current[current["label"] == 0].sort_values("area", ascending=False)["id"].head(5).astype(int).tolist()
+    ref = current[current["label"] == 1].sort_values("area", ascending=False)["id"].head(3).astype(int).tolist()
+    track_ids = []
+    for track_id in obs + ref:
+        if track_id not in track_ids:
+            track_ids.append(track_id)
+    return track_ids
 
 
-def make_figure(dataset_root: Path, output: Path) -> None:
-    summary = pd.read_csv(dataset_root / "dataset_counts_summary.csv")
-    examples = choose_units(summary, dataset_root, n=4)
+def draw_polyline(canvas: np.ndarray, pts: np.ndarray, color: tuple[int, int, int], thickness: int = 2) -> None:
+    if len(pts) < 2:
+        return
+    pts_i = np.round(pts).astype(np.int32).reshape((-1, 1, 2))
+    cv2.polylines(canvas, [pts_i], isClosed=False, color=color, thickness=thickness, lineType=cv2.LINE_AA)
+    for x, y in pts_i.reshape((-1, 2))[:: max(1, len(pts_i) // 5)]:
+        cv2.circle(canvas, (int(x), int(y)), 2, color, -1, lineType=cv2.LINE_AA)
 
-    plt.rcParams.update(
-        {
-            "font.family": "sans-serif",
-            "font.sans-serif": ["Arial", "DejaVu Sans", "sans-serif"],
-            "font.size": 8,
-            "figure.facecolor": "white",
-            "axes.facecolor": "white",
-        }
-    )
-    fig, axes = plt.subplots(
-        2,
-        2,
-        figsize=(9.6, 6.1),
-        dpi=220,
-        gridspec_kw={"wspace": 0.08, "hspace": 0.18},
-    )
-    for ax, example in zip(axes.flat, examples):
-        draw_panel(ax, *example)
 
-    legend_handles = [
-        plt.Line2D([0], [0], color=OBS_COLOR, lw=2, label="Observed segment"),
-        plt.Line2D([0], [0], color=REF_COLOR, lw=2, label="Distant reference"),
-    ]
-    fig.legend(
-        handles=legend_handles,
-        loc="lower center",
-        ncol=2,
-        frameon=False,
-        fontsize=9,
-        bbox_to_anchor=(0.5, 0.0),
-    )
-    fig.tight_layout(rect=[0, 0.055, 1, 1], h_pad=0.8, w_pad=0.25)
+def draw_box(canvas: np.ndarray, row, color: tuple[int, int, int]) -> None:
+    x1, y1 = int(round(row.x)), int(round(row.y))
+    x2, y2 = int(round(row.x + row.w)), int(round(row.y + row.h))
+    cv2.rectangle(canvas, (x1, y1), (x2, y2), color, 2, lineType=cv2.LINE_AA)
+
+
+def draw_teaser(gt: pd.DataFrame, frame: np.ndarray, frame_idx: int, output: Path) -> None:
+    canvas = frame.copy()
+    overlay = canvas.copy()
+    track_ids = select_visible_tracks(gt, frame_idx)
+
+    for track_id in track_ids:
+        track = gt[gt["id"] == track_id].sort_values("frame")
+        track = track[(track["frame"] >= frame_idx - 110) & (track["frame"] <= frame_idx + 80)]
+        for label, color in [(0, OBS_COLOR), (1, REF_COLOR)]:
+            part = track[track["label"] == label]
+            pts = part[["bc_x", "bc_y"]].to_numpy(dtype=float)
+            draw_polyline(overlay, pts, color, thickness=2)
+
+    cv2.addWeighted(overlay, 0.82, canvas, 0.18, 0, canvas)
+
+    current = gt[gt["frame"] == frame_idx].copy()
+    current = current[current["id"].isin(track_ids)]
+    current["area"] = current["w"] * current["h"]
+    for row in current.sort_values("area", ascending=False).itertuples(index=False):
+        color = OBS_COLOR if int(row.label) == 0 else REF_COLOR
+        draw_box(canvas, row, color)
+
     output.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(output, dpi=220, bbox_inches="tight", facecolor="white")
-    plt.close(fig)
+    cv2.imwrite(str(output), canvas)
+
+
+def make_figure(dataset_root: Path, output: Path, preferred_scene: str) -> None:
+    summary = pd.read_csv(dataset_root / "dataset_counts_summary.csv")
+    _, _, gt_path, video_path = select_unit(summary, dataset_root, preferred_scene)
+    gt = load_gt(gt_path)
+    frame_idx = select_frame(gt)
+    frame = read_frame(video_path, frame_idx)
+    draw_teaser(gt, frame, frame_idx, output)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset-root", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--scene", default="G5013-K207")
     args = parser.parse_args()
-    make_figure(args.dataset_root, args.output)
+    make_figure(args.dataset_root, args.output, args.scene)
 
 
 if __name__ == "__main__":

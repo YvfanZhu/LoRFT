@@ -23,7 +23,7 @@
 </div>
 
 <p align="center">
-  <img src="assets/lorft_teaser.png" width="92%" alt="LoRFT fixed-camera trajectory annotations">
+  <img src="assets/lorft_teaser.png" width="70%" alt="LoRFT fixed-camera trajectory annotations">
 </p>
 
 ## Overview
@@ -36,17 +36,17 @@ This repository includes the LoRFT processed trajectory data, road-geometry anno
 
 ## Dataset
 
-| Item | Value |
-| --- | ---: |
-| Surveillance scenes | 22 |
-| Video frames | 366,109 |
-| Manually verified trajectories | 6,601 |
-| Vehicle bounding boxes | 2,694,889 |
-| Frame rate | 25 FPS |
-| Video resolution | 352 x 288 |
-| Scene split | 14 train / 4 validation / 4 test |
+**LoRFT Fixed-Camera Highway Trajectory Reconstruction Dataset**
 
-The videos were collected from expressway surveillance sites in Sichuan Province, China, using roadside and gantry-mounted fixed cameras.
+**Dataset Scale:** 22 expressway surveillance scenes, 366,109 video frames, 6,601 manually verified vehicle trajectories, and 2,694,889 vehicle bounding boxes.
+
+**Data Distribution:** 14 training scenes, 4 validation scenes, and 4 test scenes under a scene-level split.
+
+**Video Setting:** Fixed highway surveillance videos collected from roadside and gantry-mounted cameras at 25 FPS and 352 x 288 resolution.
+
+**Annotation Quality:** Provides observed/reference trajectory labels, vehicle bounding boxes, track identities, and scene-level road-geometry annotations.
+
+**Research Value:** Provides a standardized benchmark for evaluating long-range vehicle trajectory reconstruction under fixed-camera perspective degradation.
 
 ### Annotation Protocol
 
