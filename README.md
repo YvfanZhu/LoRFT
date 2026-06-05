@@ -2,7 +2,7 @@
 
 # LoRFT / Map-RSTNet
 
-**Benchmarking Long-Range Vehicle Trajectory Reconstruction from Fixed Highway Cameras**
+**Long-Range Vehicle Trajectory Reconstruction from Fixed Highway Cameras**
 
 <p>
   <a href="#quick-start">Quick Start</a> |
@@ -22,29 +22,29 @@
 
 </div>
 
-This repository contains the public implementation of Map-RSTNet used in the accompanying paper. Map-RSTNet reconstructs long-range vehicle trajectories from observed tracking fragments by combining residual sequence prediction with map-aware geometric constraints.
+LoRFT is an open benchmark for long-range vehicle trajectory reconstruction from fixed highway cameras. The task starts from a reliable near-field vehicle tracklet and reconstructs the distant continuation of the same vehicle in the original fixed-camera image plane.
 
-LoRFT studies a fixed-camera highway setting where a reliable near-field tracklet is observed, while the distant continuation of the same vehicle becomes difficult to preserve because of perspective compression, scale decay, occlusion, and association instability. Map-RSTNet reconstructs the far-range continuation in a road-aligned state space and projects the result back to the original image plane.
+This repository provides the LoRFT benchmark resources, evaluation pipeline, and Map-RSTNet reference implementation. Map-RSTNet is a map-aware residual Seq2Seq model that reconstructs distant vehicle trajectories in a road-aligned state space and projects the results back to the image plane.
 
-The released code supports preprocessing, model training, prediction, and evaluation on highway trajectory scenes. The default configuration follows the paper setting with `obs_len=60` and `pred_len=125`.
+The benchmark targets a common limitation of highway surveillance videos: fixed cameras provide continuous monitoring, but automatic tracking often becomes fragmented or terminates early in distant regions because of perspective compression, scale decay, occlusion, and unstable association.
 
 ## News
 
-- Public code release for the LoRFT benchmark pipeline and Map-RSTNet.
+- Initial release of the LoRFT benchmark codebase and Map-RSTNet reference implementation.
 - The pipeline supports scene-level splits and multi-clip ground-truth folders.
-- Original video data are hosted on Hugging Face: [YvfanZhu/LoRFT](https://huggingface.co/datasets/YvfanZhu/LoRFT).
+- Original video data are hosted separately on Hugging Face: [YvfanZhu/LoRFT](https://huggingface.co/datasets/YvfanZhu/LoRFT).
 
 ## Highlights
 
-- **Map-aware trajectory reconstruction.** Road centerlines, boundaries, and zone metadata provide geometric context for long-range prediction.
-- **Residual Seq2Seq modeling.** The model predicts future trajectory displacement from observed vehicle motion and map-related features.
-- **Scene-level evaluation.** The default split separates training, validation, and test road scenes to reduce scene leakage.
-- **Multi-clip support.** Multiple GT clips can share the same road-scene map file.
-- **Reproducible public pipeline.** Preprocessing, training, inference, and evaluation are exposed through simple entry scripts.
+- **Long-range reconstruction task.** LoRFT evaluates whether the distant continuation of a known vehicle can be reconstructed from a reliable near-field tracklet.
+- **Fixed-camera highway setting.** The benchmark preserves image-space degradation from routine surveillance cameras, including perspective compression, scale decay, occlusion, and track fragmentation.
+- **Manual trajectory verification.** The released annotations include observed and distant reference segments for the same vehicle, with vehicle bounding boxes and scene-level road geometry.
+- **Map-aware baseline.** Map-RSTNet uses road centerlines, road boundaries, and zone metadata to reconstruct trajectories in a road-aligned state space.
+- **Scene-level protocol.** Predefined train/validation/test splits separate road scenes to reduce leakage from camera viewpoint, road layout, and background appearance.
 
 ## Benchmark Overview
 
-LoRFT is designed for long-range vehicle trajectory reconstruction from fixed highway cameras. The benchmark contains:
+LoRFT contains:
 
 - 22 expressway surveillance scenes.
 - 366,109 video frames.
@@ -53,7 +53,7 @@ LoRFT is designed for long-range vehicle trajectory reconstruction from fixed hi
 - Scene-level road-geometry annotations.
 - Predefined scene-level splits and evaluation scripts.
 
-On LoRFT, Map-RSTNet achieves `ADE=12.32`, `FDE=21.71`, and `RMSE-5s=27.47` pixels under the default long-range reconstruction setting.
+Under the default benchmark configuration, Map-RSTNet achieves `ADE=12.32`, `FDE=21.71`, and `RMSE-5s=27.47` pixels.
 
 ## Repository Structure
 
@@ -118,12 +118,12 @@ GT files are comma-separated text files with 10 columns:
 frame,id,x,y,w,h,c,d,e,label
 ```
 
-The label column is used by the public inference and evaluation flow:
+The label column defines the reconstruction protocol:
 
 - `label=0`: observed rows used as model input.
-- `label=1`: target rows used for evaluation.
+- `label=1`: distant reference rows used for evaluation.
 
-Training preprocessing builds supervised sliding windows from the labeled trajectories. The default public configuration uses `obs_len=60`, `pred_len=125`, and 25 FPS data.
+Training preprocessing builds supervised sliding windows from the labeled trajectories. The default benchmark configuration uses `obs_len=60`, `pred_len=125`, and 25 FPS data.
 
 ## Installation
 
@@ -137,7 +137,7 @@ The main dependencies are PyTorch, NumPy, pandas, PyYAML, pykalman, Shapely, and
 
 ## Quick Start
 
-Run the full public pipeline from the repository root:
+Run the full pipeline from the repository root:
 
 ```bash
 python run_preprocess.py
@@ -219,16 +219,9 @@ The original video data are distributed separately through the LoRFT dataset pag
 
 ## Citation
 
-If this repository is useful for your research, please cite the accompanying paper. The BibTeX entry will be updated after publication.
+The related manuscript has not been formally published yet. Please do not cite this repository as a paper publication.
 
-```bibtex
-@article{maprstnet,
-  title   = {LoRFT: Benchmarking Long-Range Vehicle Trajectory Reconstruction from Fixed Highway Cameras},
-  author  = {Anonymous},
-  journal = {To appear},
-  year    = {2026}
-}
-```
+A BibTeX entry will be added after publication. For now, if you use this repository, please refer to the GitHub project URL.
 
 ## Contact
 
