@@ -7,7 +7,7 @@ To request access to the LoRFT video data, please complete the following steps:
 1. Read this Data Use Agreement carefully.
 2. Copy the full text of this agreement into a document editor such as Microsoft Word, Google Docs, or Overleaf.
 3. Fill in the applicant information section at the end of this agreement.
-4. Add your signature and the signing date.
+4. Add your handwritten signature or electronic signature and the signing date.
 5. Export the completed agreement as a PDF file.
 6. Upload the signed PDF to a cloud storage service with view permission enabled.
 7. Submit the shared PDF link in the Hugging Face access request form under `Signed agreement link`.
