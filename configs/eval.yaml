@@ -1,0 +1,21 @@
+evaluation:
+  prediction_path: null
+  prediction_dir: '{project_root}/outputs/experiments/map_rstnet/predictions/prediction_only'
+  prediction_file_pattern: '{scene}_prediction_only.txt'
+  gt_root: '{project_root}/data/gt'
+  gt_label_filter: 1
+  prediction_coordinate_type: tlwh
+  gt_coordinate_type: tlwh
+  min_target_points: null
+  scene: null
+  scenes: []
+  use_scene_split: true
+  split_name: test_scenes
+  output_dir: '{project_root}/outputs/experiments/map_rstnet/eval'
+  rmse_seconds:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  support_backward: true

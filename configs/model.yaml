@@ -1,0 +1,27 @@
+model:
+  dt: 0.04
+  encoder:
+    input_dim: 10
+    hidden_dim: 256
+    num_layers: 2
+    dropout: 0.3
+    bidirectional: false
+  decoder:
+    input_dim: 10
+    hidden_dim: 256
+    output_dim: 2
+    num_layers: 2
+    dropout: 0.3
+  decode:
+    max_delta: 0.04
+  dynamic_geo:
+    enabled: true
+    refresh_every: 1
+    dtheta_mode: motion_aligned
+    map_data_dir: null
+loss:
+  position_weight: 1200.0
+  velocity_weight: 10.0
+  endpoint_weight: 150.0
+  velocity_scale: 10.0
+  boundary_weight: 40.0

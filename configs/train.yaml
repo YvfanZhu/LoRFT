@@ -1,0 +1,44 @@
+training:
+  batch_size: 128
+  num_workers: 8
+  epochs: 100
+  learning_rate: 7.0e-05
+  weight_decay: 0.0005
+  grad_clip: 1
+  use_relative_coords: true
+  device: auto
+  prefer_multi_gpu: true
+  min_gpus_for_multi: 2
+  early_stopping:
+    enabled: true
+    patience: 8
+    min_delta: 0.0005
+    start_epoch: 50
+    monitor: rmse_5s
+scheduler:
+  type: ReduceLROnPlateau
+  factor: 0.5
+  patience: 5
+  min_lr: 5.0e-06
+  monitor: rmse_5s
+teacher_forcing:
+  enabled: true
+  strategy: linear
+  decay_steps: 50
+  initial_ratio: 0.5
+  final_ratio: 0.0
+checkpoint:
+  save_dir: '{project_root}/outputs/experiments/map_rstnet/checkpoints'
+  save_every: 1
+  save_best: true
+  metric: rmse_5s
+  resume: false
+  resume_path: null
+logging:
+  log_dir: '{project_root}/outputs/experiments/map_rstnet/logs'
+  tensorboard: true
+  print_every: 10
+distributed:
+  enabled: false
+  mixed_precision: true
+seed: 42

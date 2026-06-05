@@ -1,0 +1,95 @@
+sliding_window:
+  obs_len: 60
+  pred_len: 125
+  step: 5
+  train_step: 5
+  val_step: 5
+  test_step: 5
+  min_track_len: 185
+  max_invalid_ratio: 0.15
+data_split:
+  split_by_scene: true
+  random_seed: 42
+  sort_scenes_before_shuffle: true
+  train_count: 14
+  val_count: 4
+  test_count: 4
+  train_scenes:
+  - S8-K75
+  - SA2-K133
+  - G5013-K237
+  - G0512-K82
+  - G5013-K154
+  - G5013-K207
+  - S1-K6
+  - SA2-K188
+  - G5013-K141
+  - G5013-K212
+  - SA2-K152
+  - G5013-K219
+  - G5-K1540
+  - G5-K2310
+  val_scenes:
+  - S4-K194
+  - G5013-K114
+  - SA2-K145
+  - G85-K1457
+  test_scenes:
+  - G5013-K147
+  - G5-K1846
+  - S3-K72
+  - SA2-K201
+  train_ratio: 0.7
+  val_ratio: 0.3
+features:
+  input_dim: 10
+  velocity_scale: 10.0
+rts_smoother:
+  fps: 25
+  process_noise_pos: 1.0
+  process_noise_vel: 5.0
+  measurement_noise: 10.0
+  dt: 0.04
+time_reversal:
+  enabled: true
+heading_estimation:
+  mode: motion_aligned
+  dtheta_mode: motion_aligned
+  window: 5
+  min_step_px: 1.0
+paths:
+  gt_root: '{project_root}/data/gt'
+  map_root: '{project_root}/data/map_files'
+  output_dir: '{project_root}/outputs/experiments/map_rstnet/data/preprocessed'
+  train_data: '{project_root}/outputs/experiments/map_rstnet/data/train_ready/train_data.pkl'
+  val_data: '{project_root}/outputs/experiments/map_rstnet/data/train_ready/val_data.pkl'
+  test_data: '{project_root}/outputs/experiments/map_rstnet/data/train_ready/test_data.pkl'
+  scene_split_file: '{project_root}/outputs/experiments/map_rstnet/data/preprocessed/scene_split.json'
+logging:
+  level: INFO
+  save_stats: true
+map_matching:
+  low_speed_threshold: 2.0
+scenes:
+- G0512-K82
+- G5-K1540
+- G5-K1846
+- G5-K2310
+- G5013-K114
+- G5013-K141
+- G5013-K147
+- G5013-K154
+- G5013-K207
+- G5013-K212
+- G5013-K219
+- G5013-K237
+- G85-K1457
+- S1-K6
+- S3-K72
+- S4-K194
+- S8-K75
+- SA2-K133
+- SA2-K145
+- SA2-K152
+- SA2-K188
+- SA2-K201

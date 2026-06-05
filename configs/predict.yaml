@@ -1,0 +1,64 @@
+scene:
+  name: null
+  available_scenes:
+  - G0512-K82
+  - G5-K1540
+  - G5-K1846
+  - G5-K2310
+  - G5013-K114
+  - G5013-K141
+  - G5013-K147
+  - G5013-K154
+  - G5013-K207
+  - G5013-K212
+  - G5013-K219
+  - G5013-K237
+  - G85-K1457
+  - S1-K6
+  - S3-K72
+  - S4-K194
+  - S8-K75
+  - SA2-K133
+  - SA2-K145
+  - SA2-K152
+  - SA2-K188
+  - SA2-K201
+map:
+  data_dir: '{project_root}/data/map_files'
+inference:
+  device: auto
+  use_scene_split: true
+  split_name: test_scenes
+  scenes: []
+  input:
+    data_path: '{project_root}/data/gt'
+    file_pattern: '{scene}/gt/gt.txt'
+    use_label_filter: true
+    label_column: label
+    observed_label: 0
+  rts_smoother:
+    process_noise_pos: 1.0
+    process_noise_vel: 5.0
+    measurement_noise: 10.0
+  motion_clamp:
+    enabled: true
+    max_step_scale_u: 1.0
+    max_step_scale_y: 0.85
+    max_step_scale_u_upstream: 0.65
+    max_step_scale_u_downstream: 0.85
+    max_step_scale_y_upstream: 0.65
+    max_step_scale_y_downstream: 0.85
+    step_floor_u: 0.0008
+    step_floor_y: 0.0008
+  frame_range:
+    enabled: true
+    start_frame: 1
+    end_frame: 3001
+  output:
+    prediction_only_dir: '{project_root}/outputs/experiments/map_rstnet/predictions/prediction_only'
+    prediction_only_file_pattern: '{scene}_prediction_only.txt'
+    obs_and_prediction_dir: '{project_root}/outputs/experiments/map_rstnet/predictions/obs_and_prediction'
+    obs_and_prediction_file_pattern: '{scene}_obs_and_prediction.txt'
+    report_path: '{project_root}/outputs/experiments/map_rstnet/predictions/infer_report.json'
+model:
+  checkpoint_path: null

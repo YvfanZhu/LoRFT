@@ -1,0 +1,40 @@
+project:
+  name: 'Map-RSTNet: A Map-aware Residual Seq2Seq Network for Long-Range Trajectory
+    Reconstruction'
+image:
+  width: 1920
+  height: 1080
+paths:
+  preprocessed_dir: '{project_root}/outputs/experiments/map_rstnet/data/preprocessed'
+  train_ready_dir: '{project_root}/outputs/experiments/map_rstnet/data/train_ready'
+  train_data: '{project_root}/outputs/experiments/map_rstnet/data/train_ready/train_data.pkl'
+  val_data: '{project_root}/outputs/experiments/map_rstnet/data/train_ready/val_data.pkl'
+  test_data: '{project_root}/outputs/experiments/map_rstnet/data/train_ready/test_data.pkl'
+  scene_split_file: '{project_root}/outputs/experiments/map_rstnet/data/preprocessed/scene_split.json'
+  checkpoint_dir: '{project_root}/outputs/experiments/map_rstnet/checkpoints'
+  prediction_dir: '{project_root}/outputs/experiments/map_rstnet/predictions'
+  eval_dir: '{project_root}/outputs/experiments/map_rstnet/eval'
+  log_dir: '{project_root}/outputs/experiments/map_rstnet/logs'
+scenes:
+- G0512-K82
+- G5-K1540
+- G5-K1846
+- G5-K2310
+- G5013-K114
+- G5013-K141
+- G5013-K147
+- G5013-K154
+- G5013-K207
+- G5013-K212
+- G5013-K219
+- G5013-K237
+- G85-K1457
+- S1-K6
+- S3-K72
+- S4-K194
+- S8-K75
+- SA2-K133
+- SA2-K145
+- SA2-K152
+- SA2-K188
+- SA2-K201
