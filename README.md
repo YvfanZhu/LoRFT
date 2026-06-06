@@ -15,7 +15,7 @@
   <img src="https://img.shields.io/badge/Python-3.8%2B-blue" alt="Python">
   <img src="https://img.shields.io/badge/PyTorch-2.1%2B-ee4c2c" alt="PyTorch">
   <img src="https://img.shields.io/badge/License-MIT-green" alt="License">
-  <a href="https://huggingface.co/datasets/YvfanZhu/LoRFT">
+  <a href="https://docs.google.com/forms/d/e/1FAIpQLSer9Cav6uK0TNWvOWlwRzrPQ4V-4YcMjrBrUFYX9jXlYNj9tA/viewform?usp=header">
     <img src="https://img.shields.io/badge/Dataset-LoRFT-yellow" alt="Dataset">
   </a>
 </p>
@@ -72,9 +72,13 @@ data/
 `-- README.md
 ```
 
-The map JSON files contain scene-level road centerlines, road boundaries, and traffic-direction metadata. Original videos are distributed separately through the LoRFT dataset page:
+The map JSON files contain scene-level road centerlines, road boundaries, and traffic-direction metadata. Original videos are distributed separately under controlled access.
 
-- [https://huggingface.co/datasets/YvfanZhu/LoRFT](https://huggingface.co/datasets/YvfanZhu/LoRFT)
+**Video Data Access:** To request access to the LoRFT video data, please complete the following form:
+
+- [LoRFT Video Data Request Form](https://docs.google.com/forms/d/e/1FAIpQLSer9Cav6uK0TNWvOWlwRzrPQ4V-4YcMjrBrUFYX9jXlYNj9tA/viewform?usp=header)
+
+Applicants should download and sign the agreement linked in the request form, upload the signed agreement to a cloud drive with view permission enabled, and submit the shared link in the form.
 
 ## Map-RSTNet
 
@@ -124,3 +128,7 @@ The related manuscript has not been formally published yet. Please do not cite t
 ## Contact
 
 For questions about the code or data format, please open an issue in this repository.
+
+For video data access requests, please use the request form above.
+
+- Email: [corfyi@csust.edu.cn](mailto:corfyi@csust.edu.cn)
