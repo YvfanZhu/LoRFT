@@ -121,6 +121,10 @@ scripts/              # Preprocessing, training, inference, evaluation
 utils/                # Configuration, geometry, map matching, metrics
 ```
 
+## License
+
+The software code in this repository is released under the MIT License. The LoRFT dataset materials, including videos, annotations, map files, road-geometry files, and data obtained through the video data request form, are not covered by the MIT License and are subject to the controlled-access data use terms.
+
 ## Manuscript Status
 
 The related manuscript has not been formally published yet. Please do not cite this repository as a paper publication. A formal citation entry will be added after publication.

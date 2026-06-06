@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 Map-RSTNet Authors
+Copyright (c) 2026 LoRFT / Map-RSTNet Authors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +19,24 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+Data Use Notice
+---------------
+
+This MIT License applies only to the software source code, scripts, model
+implementations, configuration files, and software documentation in this
+repository.
+
+This MIT License does not apply to the LoRFT dataset materials, including but
+not limited to original video files, trajectory annotations, bounding-box
+annotations, map files, road-geometry files, derived dataset files, downloaded
+data packages, or any data obtained through the LoRFT video data request form.
+
+The LoRFT video data is distributed separately under controlled access. Use,
+storage, redistribution, publication, and sharing of the LoRFT video data are
+governed by the data use agreement and access conditions provided through the
+official LoRFT video data request form.
+
+Unless explicit written permission is granted by the LoRFT maintainers, users
+may not redistribute, sublicense, publish, sell, transfer, mirror, or share the
+LoRFT dataset materials with any third party.
