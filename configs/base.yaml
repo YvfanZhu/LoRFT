@@ -2,8 +2,8 @@ project:
   name: 'Map-RSTNet: A Map-aware Residual Seq2Seq Network for Long-Range Trajectory
     Reconstruction'
 image:
-  width: 1920
-  height: 1080
+  width: 352
+  height: 288
 paths:
   preprocessed_dir: '{project_root}/outputs/experiments/map_rstnet/data/preprocessed'
   train_ready_dir: '{project_root}/outputs/experiments/map_rstnet/data/train_ready'
