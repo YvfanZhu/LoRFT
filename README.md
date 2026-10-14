@@ -38,7 +38,7 @@ This repository includes the LoRFT processed trajectory data, road-geometry anno
 
 **LoRFT Fixed-Camera Highway Trajectory Reconstruction Dataset**
 
-**Dataset Scale:** 22 expressway surveillance scenes, 366,109 video frames, 6,601 manually verified vehicle trajectories, and 2,694,889 vehicle bounding boxes.
+**Dataset Scale:** 22 expressway surveillance scenes, 366,109 video frames, 6,600 manually verified vehicle trajectories, and 2,694,888 vehicle bounding boxes.
 
 **Data Distribution:** 14 training scenes, 4 validation scenes, and 4 test scenes under a scene-level split.
 
